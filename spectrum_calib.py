@@ -11,7 +11,7 @@ def main():
     fig, ax = plt.subplots(figsize=(10, 5))
     plt.rcParams["font.size"] = 20
     ax.set_xlabel('Wavelength (nm)', fontsize=18)
-    ax.set_ylabel('Intensity (a.u)', fontsize=18)
+    ax.set_ylabel('Intensity (uW/cm^2/nm)', fontsize=18)
     ax.grid(True)
     line, = ax.plot([], [], color='blue')
 
@@ -29,7 +29,7 @@ def main():
 
     try:
         while running and measurement_count < max_measurements:
-            wavelength, intensity = spec.normalize_spectrum()
+            wavelength, intensity = spec.get_calibrated_spectrum()
             line.set_data(wavelength, intensity)
             ax.relim()
             ax.autoscale_view()

@@ -85,17 +85,35 @@ spec.configure_acquisition()                 # Reconfigure with new parameters
 spectrum = spec.get_spectrum()               # Get the spectrum data from spectrometer
 ```
 
-### Example: Get spectrum with standard parameters
+### Get the spectrum data with subtract background
+
+```python
+spectrum = spec.subtract_background()               # Get the spectrum data from spectrometer with subtract background
+```
+
+### Get the spectrum data with normalization
+
+```python
+wavelength, intensity = spec.normalize_spectrum()  # Get the spectrum data from spectrometer with subtract background
+```
+
+### Get the spectrum data with calibration
+
+```python
+wavelength, intensity = spec.get_calibrated_spectrum()  # Get the spectrum data from spectrometer with subtract background
+```
+
+### Example: Get spectrum with standard parameters with normalization
 
 ```python
 from libspec import ASQESpectrometer
 
 spec = ASQESpectrometer()
 spec.configure_acquisition()
-spectrum = spec.get_spectrum()
+spectrum = spec.normalize_spectrum()
 ```
 
-### Example: Get spectrum with updated parameters
+### Example: Get spectrum with updated parameter (exposure time)
 
 ```python
 from libspectr import ASQESpectrometer
@@ -103,7 +121,7 @@ from libspectr import ASQESpectrometer
 spec = ASQESpectrometer()
 spec.set_parameters(exposure_time=2500)
 spec.configure_acquisition()
-spectrum = spec.get_spectrum()
+wavelength, spectrum = spec.normalize_spectrum()
 ```
 
 ### Example: Get and plot spectrum data
@@ -115,16 +133,13 @@ import numpy as np
 
 spec = ASQESpectrometer()
 spec.configure_acquisition()
-spectrum = spec.get_spectrum()
-
-intensity = np.ctypeslib.as_array(spectrum)
-pixels = np.arange(len(intensity))
+wavelength, intensity = spec.normalize_spectrum()
 
 plt.figure(figsize=(10, 5))
-plt.plot(pixels, intensity, color='blue')
+plt.plot(wavelength, intensity, color='blue')
 plt.title('Spectrometer Output')
-plt.xlabel('Pixel Index')
-plt.ylabel('Intensity')
+plt.xlabel('Wavelength (nm)')
+plt.ylabel('Intensity (a.u)')
 plt.grid(True)
 plt.tight_layout()
 plt.show()
@@ -143,8 +158,8 @@ spec.configure_acquisition()
 
 fig, ax = plt.subplots(figsize=(10, 5))
 plt.rcParams["font.size"] = 20
-ax.set_xlabel('Pixel Index', fontsize=18)
-ax.set_ylabel('Intensity', fontsize=18)
+ax.set_xlabel('Wavelength (nm)', fontsize=18)
+ax.set_ylabel('Intensity (a.u)', fontsize=18)
 ax.grid(True)
 line, = ax.plot([], [], color='blue')
 display(fig)
@@ -162,10 +177,8 @@ fig.canvas.mpl_connect('key_press_event', on_key)
 
 try:
     while running and measurement_count < do_measurements:
-        spectrum = spec.get_spectrum()
-        intensity = np.ctypeslib.as_array(spectrum)
-        pixels = np.arange(len(intensity))
-        line.set_data(pixels, intensity)
+        wavelength, intensity = spec.normalize_spectrum()
+        line.set_data(wavelength, intensity)
         ax.relim()
         ax.autoscale_view()
         clear_output(wait=True)

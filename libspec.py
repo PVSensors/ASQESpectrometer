@@ -139,7 +139,6 @@ class ASQESpectrometer:
         self.wavelength = np.array(lines[12:3665], dtype=float)
         self.norm_coef = np.array(lines[3666:7319], dtype=float)
         self.power_coef = np.array(lines[7320:10973], dtype=float)
-        
         self._calibration_data_loaded = True
     
     def set_parameters(self, num_of_scans=None, num_of_blank_scans=None, exposure_time=None,
@@ -230,9 +229,9 @@ class ASQESpectrometer:
         1. normalize_spectrum()
         2. power calibration: spectrum[i] *= power_coef[i] / ((exposure_time) * bck_aT)
         """
-        data = self.normalize_spectrum()
+        wavelength, data = self.normalize_spectrum()
         data *= self.power_coef / (self.exposure_time * self.bck_aT)
-        return self.wavelength, data
+        return wavelength, data
 
     def __del__(self):
         self.lib.disconnectDevice()
