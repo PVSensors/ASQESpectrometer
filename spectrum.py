@@ -17,7 +17,8 @@ def main():
 
     running = True
     measurement_count = 0
-    max_measurements = 1000
+    max_measurements = 1000 
+    
 
     def on_key(event):
         nonlocal running
