@@ -11,3 +11,4 @@ venv/
 test_data/
 notes.md
 fhl102_controller.py
+spectrum.ipynb
