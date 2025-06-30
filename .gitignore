@@ -1,0 +1,12 @@
+# Ignore compiled files
+*.pyc
+__pycache__/
+
+# Ignore environment files
+.env
+venv/
+
+# Ignore test data
+test_data/
+notes.md
+fhl102_controller.py

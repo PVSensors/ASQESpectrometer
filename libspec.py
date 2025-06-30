@@ -1,7 +1,7 @@
 import os
 import ctypes
 import sys
-#import numpy as np
+import numpy as np
 from time import sleep
 import platform
 
@@ -30,6 +30,13 @@ class ASQESpectrometer:
         self.num_of_start_element = 0
         self.num_of_end_element = 3647
         self.reduction_mode = 0
+
+        # Initialize calibration variables
+        self._calibration_data_loaded = False
+        self.bck_aT = None
+        self.wavelength = None
+        self.norm_coef = None
+        self.power_coef = None
 
         # Setup function prototypes
         self._setup_function_prototypes()
@@ -111,6 +118,30 @@ class ASQESpectrometer:
             offset += CHUNK_SIZE
         return full_data
     
+    def load_calibration_data(self):
+        """Return calibration data, reading from flash only once."""
+        # Return cached data if available
+        if self._calibration_data_loaded:
+            return
+        
+        # Read and parse flash data if not cached
+        calib = self.read_calibration_file()
+        decode_data = calib.decode("utf-8")
+        lines = decode_data.splitlines()
+
+        # Parse bck_aT from second line
+        try:
+            self.bck_aT = float(lines[1])
+        except (ValueError, IndexError) as e:
+            raise ValueError("Failed to parse bck_aT from calibration data") from e
+
+        # Parse calibration arrays and convert to float
+        self.wavelength = np.array(lines[12:3665], dtype=float)
+        self.norm_coef = np.array(lines[3666:7319], dtype=float)
+        self.power_coef = np.array(lines[7320:10973], dtype=float)
+        
+        self._calibration_data_loaded = True
+    
     def set_parameters(self, num_of_scans=None, num_of_blank_scans=None, exposure_time=None,
                    scan_mode=None, num_of_start_element=None, num_of_end_element=None,
                    reduction_mode=None):
@@ -161,8 +192,47 @@ class ASQESpectrometer:
         return buffer
 
     def get_spectrum(self):
-        # self.configure_acquisition()
         return self.capture_frame()
+    
+    def subtract_background(self):
+        """
+        1. get_spectrum()
+        2. Subtract background average from both ends of the array. Keeps only elements from index 32 to 3685.
+        """
+        data = self.capture_frame()
+        devd = np.mean(data[15:31])      # average of elements 15 to 31
+        devd2 = np.mean(data[3686:3692]) # average of elements 3686 to 3692
+        background = (devd + devd2) / 2
+
+        # Subtract background and slice
+        corrected = data[32:3685] - background
+        return corrected
+    
+    def normalize_spectrum(self):
+        """
+        1. subtract_background()
+        2. Apply full calibration to spectrum: Normalization: spectrum[i] /= norm_coef[i]
+        """
+        if not self._calibration_data_loaded:
+            self.load_calibration_data()
+        
+        data = self.subtract_background()
+        # Convert to float for precision during calculations
+        data = data.astype(np.float64)
+
+        # Apply normalization coefficients
+        data /= self.norm_coef
+        return self.wavelength, data
+    
+    def get_calibrated_spectrum(self):
+        """
+        Apply full calibration to spectrum:
+        1. normalize_spectrum()
+        2. power calibration: spectrum[i] *= power_coef[i] / ((exposure_time) * bck_aT)
+        """
+        data = self.normalize_spectrum()
+        data *= self.power_coef / (self.exposure_time * self.bck_aT)
+        return self.wavelength, data
 
     def __del__(self):
         self.lib.disconnectDevice()
