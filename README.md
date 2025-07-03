@@ -17,22 +17,22 @@ spec.configure_acquisition()                 # Initial Device Configuration
 
 ### Standard Parameters Device Configuration
 
-| Parameter              | Value   | Description                                 |
-| ---------------------- | ------- | ------------------------------------------- |
-| `num_of_scans`         | 1       | Number of spectral averages per measurement |
-| `num_of_blank_scans`   | 0       | Background reference measurements           |
-| `exposure_time`        | 1000 ms | Integration time per scan (1 second)        |
-| `scan_mode`            | 3       | Acquisition mode (hardware-specific code)   |
-| `num_of_start_element` | 0       | First CCD pixel index (start of array)      |
-| `num_of_end_element`   | 3647    | Last CCD pixel index (3648-element array)   |
-| `reduction_mode`       | 0       | Data processing mode (hardware-specific)    |
+| Parameter              | Value | Description                                 |
+| ---------------------- | ----- | ------------------------------------------- |
+| `num_of_scans`         | 1     | Number of spectral averages per measurement |
+| `num_of_blank_scans`   | 0     | Background reference measurements           |
+| `exposure_time`        | 1000  | Integration time in microseconds (10 ms)    |
+| `scan_mode`            | 3     | Acquisition mode (hardware-specific code)   |
+| `num_of_start_element` | 0     | First CCD pixel index (start of array)      |
+| `num_of_end_element`   | 3647  | Last CCD pixel index (3648-element array)   |
+| `reduction_mode`       | 0     | Data processing mode (hardware-specific)    |
 
 ```python
 # Corresponding initialization code
 {
     "num_of_scans": 1,
     "num_of_blank_scans": 0,
-    "exposure_time": 1000,
+    "exposure_time": 1000,     #.   in microseconds (10 ms)
     "scan_mode": 3,
     "num_of_start_element": 0,
     "num_of_end_element": 3647,
