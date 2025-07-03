@@ -61,7 +61,7 @@ spec.configure_acquisition()                 # Reconfigure with new parameters
 | ---------------------- | -------- | ------------------------------------------- |
 | `num_of_scans`         | 1 - 137  | Number of spectral averages per measurement |
 | `num_of_blank_scans`   | 0 - 137  | Background reference measurements           |
-| `exposure_time`        | 1000 ... | Integration time (10μs units)               |
+| `exposure_time`        | 1000 ... | Integration time (10ms units)               |
 | `scan_mode`            | 0 - 3    | Acquisition mode                            |
 | `num_of_start_element` | 0        | First CCD pixel index (start of array)      |
 | `num_of_end_element`   | 3647     | Last CCD pixel index (3648-element array)   |
