@@ -210,7 +210,7 @@ class ASQESpectrometer:
     def normalize_spectrum(self):
         """
         1. subtract_background()
-        2. Apply full calibration to spectrum: Normalization: spectrum[i] /= norm_coef[i]
+        2. Apply narmalization to spectrum: Normalization: spectrum[i] /= norm_coef[i]
         """
         if not self._calibration_data_loaded:
             self.load_calibration_data()
