@@ -1,5 +1,11 @@
 # Spectrometer Control API Documentation
 
+## Before using, install the libraries from requirements.txt
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Device Connection & Initialization
 
 ```python
